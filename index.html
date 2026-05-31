@@ -5,6 +5,7 @@
   <meta charset="UTF-8">
   <title>통합 관리 도구</title>
   <style>
+    /* --- 다크모드 & 라이트모드 CSS 변수 제어 --- */
     :root {
       --bg: #1a1a1b;
       --card: #2c2c2e;
@@ -15,6 +16,28 @@
       --point: #00e676;
       --success: #00e676;
       --blue: #4fc3f7;
+      --input-bg: #3a3a3c;
+      --input-text: #fff;
+      --ticket-bg: #252526;
+      --sub-panel-bg: #232324;
+      --box-shadow: rgba(0, 0, 0, 0.5);
+    }
+
+    [data-theme='light'] {
+      --bg: #f0f2f5;
+      --card: #ffffff;
+      --accent: #f57c00;
+      --text: #333333;
+      --border: #cccccc;
+      --btn-bg: #e0e0e0;
+      --point: #2e7d32;
+      --success: #2e7d32;
+      --blue: #1976d2;
+      --input-bg: #f9f9f9;
+      --input-text: #000;
+      --ticket-bg: #f8f8f8;
+      --sub-panel-bg: #eeeeee;
+      --box-shadow: rgba(0, 0, 0, 0.15);
     }
 
     body {
@@ -25,15 +48,22 @@
       flex-direction: column;
       align-items: center;
       padding: 20px;
+      transition: background 0.3s, color 0.3s;
     }
 
-    /* --- 탭 메뉴 스타일 --- */
+    /* --- 상단 레이아웃 및 제어 버튼 --- */
+    .header-wrapper {
+      display: flex;
+      gap: 10px;
+      width: 100%;
+      max-width: 1100px;
+      margin-bottom: 20px;
+    }
+
     .tab-nav {
       display: flex;
       gap: 10px;
-      margin-bottom: 20px;
-      width: 100%;
-      max-width: 1100px;
+      flex: 1;
     }
 
     .tab-link {
@@ -41,7 +71,8 @@
       height: 40px;
       background: var(--card);
       border: 1px solid var(--border);
-      color: #aaa;
+      color: var(--text);
+      opacity: 0.6;
       border-radius: 8px;
       cursor: pointer;
       font-weight: bold;
@@ -55,6 +86,36 @@
       background: var(--accent);
       color: #000;
       border-color: var(--accent);
+      opacity: 1;
+    }
+
+    /* 유틸리티 버튼 공통 스타일 */
+    .util-btn {
+      padding: 0 15px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      cursor: pointer;
+      color: var(--text);
+      font-weight: bold;
+      transition: all 0.2s;
+      width: 120px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .util-btn:hover {
+      background: var(--btn-bg);
+    }
+    
+    /* 위치 전환 버튼 강조 색상 */
+    .util-btn.swap-btn {
+      background: #8e24aa;
+      color: #fff;
+      border: none;
+    }
+    .util-btn.swap-btn:hover {
+      opacity: 0.9;
     }
 
     .tab-panel {
@@ -67,7 +128,7 @@
       display: flex;
     }
 
-    /* --- 비욘드 & 겁화 레이아웃 --- */
+    /* --- 레이아웃 공통 (비욘드 & 분석) --- */
     .beyond-wrapper {
       display: flex;
       flex-direction: row;
@@ -77,13 +138,22 @@
       width: 100%;
     }
 
+    .beyond-wrapper.reverse {
+      flex-direction: row-reverse;
+    }
+
     .beyond-container {
       background-color: var(--card);
       padding: 25px;
       border-radius: 12px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      box-shadow: 0 10px 30px var(--box-shadow);
       border: 1px solid var(--border);
       width: 480px;
+    }
+
+    #asset-tracker-container {
+      flex: 1.2;
+      min-width: 420px;
     }
 
     .beyond-header {
@@ -92,6 +162,34 @@
       border-bottom: 2px solid var(--accent);
       padding-bottom: 10px;
       position: relative;
+    }
+
+    .action-btn-group {
+      position: absolute;
+      right: 0;
+      bottom: 8px;
+      display: flex;
+      gap: 6px;
+    }
+
+    .action-mini-btn {
+      background: var(--btn-bg);
+      color: var(--text);
+      border: 1px solid var(--border);
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 11px;
+      font-weight: bold;
+      transition: 0.15s;
+    }
+    .action-mini-btn:hover {
+      opacity: 0.8;
+    }
+    .action-mini-btn.convert-btn {
+      background: #1976d2;
+      color: #fff;
+      border: none;
     }
 
     .section-title {
@@ -108,7 +206,7 @@
       gap: 8px;
       justify-content: center;
       margin-bottom: 15px;
-      background: #333;
+      background: var(--ticket-bg);
       padding: 10px;
       border-radius: 8px;
     }
@@ -116,9 +214,9 @@
     .select-btn {
       flex: 1;
       padding: 10px;
-      border: 1px solid #555;
+      border: 1px solid var(--border);
       background: var(--btn-bg);
-      color: #ccc;
+      color: var(--text);
       border-radius: 6px;
       cursor: pointer;
       font-size: 13px;
@@ -130,6 +228,87 @@
       background: var(--accent);
       color: #000;
       border-color: var(--accent);
+    }
+
+    /* --- 입력 필드 표 스타일 --- */
+    .grid-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 5px;
+    }
+    .grid-table th {
+      font-size: 12px;
+      color: var(--accent);
+      padding: 8px 4px;
+      border-bottom: 1px solid var(--border);
+    }
+    .grid-table td {
+      padding: 6px 2px;
+      text-align: center;
+    }
+    .grid-table input {
+      width: 95px;
+      text-align: center; 
+      padding: 6px;
+      box-sizing: border-box;
+      background: var(--input-bg);
+      color: var(--input-text);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+    }
+    .grid-table input[readonly] {
+      background: var(--input-bg);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      color: var(--point);
+      box-shadow: none;
+    }
+
+    .grid-table input[readonly].watch-fire-start,
+    .grid-table input[readonly].watch-fire-cur,
+    .grid-table input[readonly][id*="start"],
+    .grid-table input[readonly][id*="cur"] {
+      color: var(--input-text) !important;
+    }
+
+    .row-lbl {
+      font-size: 13px;
+      font-weight: bold;
+      text-align: left;
+      padding-left: 10px !important;
+    }
+
+    .expandable-row {
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .expandable-row:hover {
+      background: var(--btn-bg);
+    }
+    .sub-panel-row {
+      display: none;
+      background: var(--sub-panel-bg);
+    }
+    .sub-panel-row.open {
+      display: table-row;
+    }
+    .sub-table {
+      width: 95%;
+      margin: 5px auto;
+      border: 1px dashed var(--border);
+      border-radius: 6px;
+    }
+    .sub-table td {
+      padding: 4px;
+      font-size: 11px;
+    }
+    .sub-table input {
+      width: 75px;
+      padding: 4px;
+      font-size: 12px;
+      background: var(--bg);
+      color: var(--input-text);
+      border: 1px solid var(--border);
     }
 
     /* --- 입력 필드 공통 --- */
@@ -147,13 +326,19 @@
     }
 
     input {
-      background: #3a3a3c;
-      border: 1px solid #555;
-      color: #fff;
+      background: var(--input-bg);
+      border: 1px solid var(--border);
+      color: var(--input-text);
       padding: 8px;
       border-radius: 6px;
       font-size: 14px;
       outline: none;
+    }
+
+    /* 연동된 입력창 스타일 강조 (연동) */
+    .linked-input {
+      color: var(--point) !important;
+      font-weight: bold;
     }
 
     #fire-calc-area input {
@@ -168,10 +353,10 @@
       display: grid;
       grid-template-columns: repeat(2, 188px);
       gap: 12px;
-      background: #252526;
+      background: var(--ticket-bg);
       padding: 15px;
       border-radius: 8px;
-      border: 1px solid #333;
+      border: 1px solid var(--border);
       justify-content: center;
     }
 
@@ -186,7 +371,7 @@
     /* --- 결과 및 게이지 --- */
     .result-box {
       margin-top: 20px;
-      background: #1a1a1b;
+      background: var(--bg);
       padding: 15px;
       border-radius: 8px;
       border-left: 5px solid var(--accent);
@@ -200,7 +385,7 @@
     }
 
     .progress-container {
-      background: #444;
+      background: var(--btn-bg);
       height: 10px;
       border-radius: 5px;
       margin-top: 10px;
@@ -208,14 +393,14 @@
     }
 
     #progress-bar {
-      background: linear-gradient(90deg, #ffca28, #ffa000);
+      background: linear-gradient(90deg, var(--accent), #ffa000);
       height: 100%;
       width: 0%;
       transition: 0.5s;
     }
 
     .template-output {
-      background: #3a3a3c;
+      background: var(--input-bg);
       color: var(--accent);
       padding: 15px;
       border-radius: 8px;
@@ -223,8 +408,8 @@
       font-size: 13px;
       white-space: pre-wrap;
       margin-top: 15px;
-      border: 1px solid #222;
-      min-height: 80px;
+      border: 1px solid var(--border);
+      min-height: 60px;
     }
 
     .btn-main {
@@ -246,11 +431,10 @@
       padding: 25px;
       border-radius: 12px;
       border: 1px solid var(--border);
-      width: 550px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      width: 550px; 
+      box-shadow: 0 10px 30px var(--box-shadow);
     }
 
-    /* 우측 정렬 클래스 추가 */
     .align-right {
       text-align: right;
     }
@@ -263,10 +447,10 @@
     }
 
     .comp-box {
-      background: #252526;
+      background: var(--ticket-bg);
       padding: 15px;
       border-radius: 12px;
-      border: 2px solid #3d3d3f;
+      border: 2px solid var(--border);
       position: relative;
       transition: 0.3s;
     }
@@ -278,10 +462,10 @@
     .badge.gold { background: var(--success); }
     .badge.time { background: var(--blue); }
 
-    .comp-title { font-size: 12px; color: #bbb; margin-bottom: 8px; }
-    .price-text { font-size: 17px; font-weight: bold; color: #fff; margin-bottom: 4px; }
+    .comp-title { font-size: 12px; color: var(--text); opacity: 0.7; margin-bottom: 8px; }
+    .price-text { font-size: 17px; font-weight: bold; color: var(--text); margin-bottom: 4px; }
     .ember-text { font-size: 13px; color: #ffa726; font-weight: bold; }
-    .desc-text { font-size: 11px; color: #888; margin-top: 8px; line-height: 1.4; }
+    .desc-text { font-size: 11px; color: var(--text); opacity: 0.5; margin-top: 8px; line-height: 1.4; }
 
     /* --- 보석 매입 스타일 --- */
     .gem-container {
@@ -290,7 +474,7 @@
       border-radius: 12px;
       border: 1px solid var(--border);
       width: 680px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      box-shadow: 0 10px 30px var(--box-shadow);
     }
 
     .gem-header {
@@ -315,13 +499,14 @@
     .config-area label {
       font-size: 12px;
       font-weight: bold;
-      color: #aaa;
+      color: var(--text);
+      opacity: 0.7;
     }
 
     .config-area input {
-      background: #1a1a1b;
-      border: 1px solid #555;
-      color: #fff;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      color: var(--input-text);
       padding: 3px 8px;
       border-radius: 4px;
       text-align: right;
@@ -346,13 +531,14 @@
 
     .card-table td {
       padding: 8px 2px;
-      border-bottom: 1px solid #38383a;
+      border-bottom: 1px solid var(--border);
       text-align: center;
     }
 
     .row-name {
       font-weight: bold;
-      color: #aaa;
+      color: var(--text);
+      opacity: 0.7;
       width: 70px;
       text-align: center !important;
     }
@@ -360,8 +546,8 @@
     .input-cell input {
       width: 50px;
       background: var(--btn-bg);
-      border: 1px solid #555;
-      color: #fff;
+      border: 1px solid var(--border);
+      color: var(--input-text);
       padding: 5px;
       border-radius: 4px;
       text-align: center;
@@ -383,7 +569,7 @@
     }
 
     .result-footer {
-      background: #1a1a1b;
+      background: var(--bg);
       padding: 15px;
       border-radius: 8px;
       display: flex;
@@ -425,96 +611,62 @@
 
 <body>
 
-  <div class="tab-nav">
-    <div class="tab-link active" onclick="showTab('beyond-pane', this)">🔥비욘드&겁화</div>
-    <div class="tab-link" onclick="showTab('analysis-pane', this)">📊 효율 분석</div>
-    <div class="tab-link" onclick="showTab('gem-pane', this)">💎 보석 계산기</div>
+  <div class="header-wrapper">
+    <div class="tab-nav">
+      <div class="tab-link active" onclick="showTab('beyond-pane', this)">🔥던전 관련</div>
+      <div class="tab-link" onclick="showTab('analysis-pane', this)">📊 겁화 효율</div>
+      <div class="tab-link" onclick="showTab('gem-pane', this)">💎 보석 계산</div>
+    </div>
+    <button class="util-btn swap-btn" id="layout-swap-btn" onclick="toggleLayoutDirection()" title="두 박스의 좌우 위치를 바꿉니다.">⇄ 위치 전환</button>
+    <button class="util-btn" id="theme-btn" onclick="toggleTheme()">☀️ 라이트 모드</button>
   </div>
 
   <div id="beyond-pane" class="tab-panel active">
-    <div class="beyond-wrapper">
+    <div class="beyond-wrapper" id="beyond-wrapper-layout">
 
-      <div class="beyond-container" id="fire-calc-area">
+      <div class="beyond-container" id="asset-tracker-container">
         <div class="beyond-header">
-          <h2 style="color:var(--accent); margin:0; font-size:22px;">전란의 겁화 계산기</h2>
-          <button style="position:absolute; right:0; bottom:10px; background:#444; color:#ccc; border:none; padding:4px 8px; border-radius:4px; cursor:pointer; font-size:11px;" onclick="resetFire()">초기화</button>
+          <h2 style="color:var(--accent); margin:0; font-size:22px;">던전 아이템</h2>
+          <div class="action-btn-group">
+            <button class="action-mini-btn convert-btn" onclick="convertCurrentToStart()" title="현재 개수들을 시작 개수 칸으로 넘깁니다.">🔄 전환</button>
+            <button class="action-mini-btn" onclick="resetDungeonTracker()">초기화</button>
+          </div>
         </div>
 
-        <div class="section-title">목표 겁화 설정</div>
-        <div class="btn-selector" id="fire-goal-group">
-          <button class="select-btn active" data-value="500" onclick="setFireGoal(500)">500개</button>
-          <button class="select-btn" data-value="1000" onclick="setFireGoal(1000)">1000개</button>
-        </div>
-
-        <div class="section-title">현재 자산</div>
-        <div class="input-group">
-          <label>보유 겁화</label>
-          <input type="number" id="f-item" class="watch-fire" value="0">
-          <span>개</span>
-        </div>
-        <div class="input-group">
-          <label>보유 불씨</label>
-          <input type="number" id="f-ember" class="watch-fire" value="0" style="color:var(--accent);">
-          <span>개</span>
-        </div>
-        <div class="input-group">
-          <label>하급 시세</label>
-          <input type="number" id="f-price" class="watch-fire" value="550000" step="50000">
-          <span>미파</span>
-        </div>
-
-        <div class="section-title">보유 중인 결정석</div>
-        <div class="input-group"><label>하급 결정석</label><input type="number" id="c1" class="watch-fire" value="0"><span>개</span></div>
-        <div class="input-group"><label>중급 결정석</label><input type="number" id="c2" class="watch-fire" value="0"><span>개</span></div>
-        <div class="input-group"><label>상급 결정석</label><input type="number" id="c3" class="watch-fire" value="0"><span>개</span></div>
-        <div class="input-group"><label>특급 결정석</label><input type="number" id="c4" class="watch-fire" value="0"><span>개</span></div>
-        <div class="input-group"><label>불멸 결정석</label><input type="number" id="c5" class="watch-fire" value="0"><span>개</span></div>
-
-        <div class="result-box">
-          <div class="result-item">
-            <span>✨ 예상 합계(결정석 포함):</span>
-            <span id="res-total" style="color:var(--accent); font-weight:bold;">0 / 500</span>
-          </div>
-          <div class="result-item">
-            <span>💰 부족분 구매 비용:</span>
-            <span id="res-gold" style="color:#00e676; font-weight:bold;">0 G</span>
-          </div>
-          <hr style="border:0; border-top:1px dashed #444; margin:10px 0;">
-          <div class="result-item">
-            <span>💎 부족한 겁화:</span>
-            <span id="res-item-gap" style="color:#ff5252; font-weight:bold;">0 개</span>
-          </div>
-          <div class="result-item">
-            <span>🔥 부족한 불씨:</span>
-            <span id="res-gap" style="color:#ff5252; font-weight:bold;">0 개</span>
-          </div>
-          <div id="res-info" style="font-size:12px; color:#aaa; margin-top:8px; line-height:1.5;"></div>
-          <div class="progress-container">
-            <div id="progress-bar"></div>
-          </div>
-        </div>
+        <div class="section-title">자산 입력</div>
+        <table class="grid-table">
+          <thead>
+            <tr>
+              <th style="text-align:center; padding-left:10px;">아이템</th>
+              <th>시작 개수</th>
+              <th>현재 개수</th>
+              <th>증가량</th>
+            </tr>
+          </thead>
+          <tbody id="fire-grid-body"></tbody>
+        </table>
       </div>
 
       <div class="beyond-container">
         <div class="beyond-header">
-          <h2 style="color:var(--accent); margin:0; font-size:22px;">비욘드 잠쩔 양식</h2>
+          <h2 style="color:var(--accent); margin:0; font-size:22px;">던전 잠쩔 계산</h2>
         </div>
         <div class="section-title">티켓 및 판수 계산</div>
         <div class="ticket-area">
           <div style="display:flex; flex-direction:column; align-items:center; gap:6px;">
-            <div style="font-size:12px; color:#aaa;">시작 티켓</div>
-            <input type="number" id="t-start" class="watch-beyond" value="0">
+            <div style="font-size:12px; color:var(--text); opacity:0.6;">시작 티켓</div>
+            <input type="number" id="t-start" class="watch-beyond auto-clear-zero" value="0">
           </div>
           <div style="display:flex; flex-direction:column; align-items:center; gap:6px;">
-            <div style="font-size:12px; color:#aaa;">획득 티켓</div>
-            <input type="number" id="t-drop" class="watch-beyond" value="0">
+            <div style="font-size:12px; color:var(--text); opacity:0.6;">획득 티켓</div>
+            <input type="number" id="t-drop" class="watch-beyond auto-clear-zero" value="0">
           </div>
           <div style="display:flex; flex-direction:column; align-items:center; gap:6px;">
-            <div style="font-size:12px; color:#aaa;">종료 티켓</div>
-            <input type="number" id="t-end" class="watch-beyond" value="0">
+            <div style="font-size:12px; color:var(--text); opacity:0.6;">종료 티켓</div>
+            <input type="number" id="t-end" class="watch-beyond auto-clear-zero" value="0">
           </div>
           <div style="display:flex; flex-direction:column; align-items:center; gap:6px;">
-            <div style="font-size:12px; color:#aaa;">계산된 판수</div>
+            <div style="font-size:12px; color:var(--text); opacity:0.6;">계산된 판수</div>
             <input type="text" id="t-result" value="0" readonly style="color:var(--accent); font-weight:bold;">
           </div>
         </div>
@@ -534,9 +686,9 @@
           <input type="text" id="buyers" class="watch-beyond" value="1, 2, 3">
         </div>
 
-        <div id="exp-fields" style="display:none; border-top: 1px dashed #555; margin-top: 12px; padding-top: 12px;">
-          <div class="input-group simple"><label>시간(h)</label><input type="number" id="p-time" class="watch-beyond" value="1"></div>
-          <div class="input-group simple"><label>금액</label><input type="number" id="p-price" class="watch-beyond" value="700" step="50"></div>
+        <div id="exp-fields" style="display:none; border-top: 1px dashed var(--border); margin-top: 12px; padding-top: 12px;">
+          <div class="input-group simple"><label>시간(h)</label><input type="number" id="p-time" class="watch-beyond auto-clear-zero" value="1"></div>
+          <div class="input-group simple"><label>금액</label><input type="number" id="p-price" class="watch-beyond auto-clear-zero" value="" step="50"></div>
         </div>
 
         <div class="template-output" id="display"></div>
@@ -546,68 +698,131 @@
   </div>
 
   <div id="analysis-pane" class="tab-panel">
-    <div class="analysis-container">
-      <div class="beyond-header">
-        <h2 style="color:var(--accent); margin:0; font-size:22px;">🎯 겁화 효율 분석기</h2>
-      </div>
+    <div class="beyond-wrapper" id="analysis-wrapper-layout">
+      
+      <div class="beyond-container" id="fire-calc-area">
+        <div class="beyond-header">
+          <h2 style="color:var(--accent); margin:0; font-size:22px;">전란의 겁화 계산</h2>
+        </div>
 
-      <div class="section-title">목표 설정</div>
-      <div class="btn-selector">
-        <button class="select-btn active analysis-goal-btn" onclick="setAnalysisGoal(500, this)">500개</button>
-        <button class="select-btn analysis-goal-btn" onclick="setAnalysisGoal(1000, this)">1000개</button>
-      </div>
+        <div class="section-title">목표 겁화 설정</div>
+        <div class="btn-selector" id="fire-goal-group">
+          <button class="select-btn active" data-value="500" onclick="setFireGoal(500)">500개</button>
+          <button class="select-btn" data-value="1000" onclick="setFireGoal(1000)">1000개</button>
+        </div>
 
-      <div class="section-title">자산 및 시세 정보</div>
-      <div class="input-group" style="grid-template-columns: 200px 1fr 40px;">
-        <label>보유 겁화</label>
-        <input type="number" id="a-cur-item" class="align-right" value="0" oninput="calcAnalysis()">
-        <span>개</span>
-      </div>
-      <div class="input-group" style="grid-template-columns: 200px 1fr 40px;">
-        <label>하결 시세</label>
-        <input type="number" id="a-p-low" class="align-right" value="600000" step="50000" oninput="calcAnalysis()">
-        <span>미파</span>
-      </div>
-      <div class="input-group" style="grid-template-columns: 200px 1fr 40px;">
-        <label>중결 시세</label>
-        <input type="number" id="a-p-mid" class="align-right" value="6000000" step="500000" oninput="calcAnalysis()">
-        <span>미파</span>
-      </div>
+        <div class="section-title">현재 자산 <span style="font-size:11px; font-weight:normal; color:var(--text); opacity:0.6;">(연동)</span></div>
+        <div class="input-group">
+          <label>보유 겁화</label>
+          <input type="number" id="f-item" class="linked-input auto-clear-zero" value="0">
+          <span>개</span>
+        </div>
+        <div class="input-group">
+          <label>보유 불씨</label>
+          <input type="number" id="f-ember" class="linked-input auto-clear-zero" value="0">
+          <span>개</span>
+        </div>
+        <div class="input-group">
+          <label>하급 시세</label>
+          <input type="number" id="f-price" class="linked-input auto-clear-zero" value="0">
+          <span>미파</span>
+        </div>
 
-      <div class="result-box" style="border-left: 5px solid var(--accent); margin-bottom: 20px;">
-        <div class="result-item">
-          <span>부족한 겁화 수량:</span>
-          <b id="a-need-count" style="color:var(--accent)">0 개</b>
+        <div class="section-title">보유 중인 결정석 <span style="font-size:11px; font-weight:normal; color:var(--text); opacity:0.6;">(연동)</span></div>
+        <div class="input-group"><label>하급 결정석</label><input type="number" id="c1" class="linked-input auto-clear-zero" value="0"><span>개</span></div>
+        <div class="input-group"><label>중급 결정석</label><input type="number" id="c2" class="linked-input auto-clear-zero" value="0"><span>개</span></div>
+        <div class="input-group"><label>상급 결정석</label><input type="number" id="c3" class="linked-input auto-clear-zero" value="0"><span>개</span></div>
+        <div class="input-group"><label>특급 결정석</label><input type="number" id="c4" class="linked-input auto-clear-zero" value="0"><span>개</span></div>
+        <div class="input-group"><label>불멸 결정석</label><input type="number" id="c5" class="linked-input auto-clear-zero" value="0"><span>개</span></div>
+
+        <div class="result-box">
+          <div class="result-item">
+            <span>✨ 예상 합계(결정석 포함):</span>
+            <span id="res-total" style="color:var(--accent); font-weight:bold;">0 / 500</span>
+          </div>
+          <div class="result-item">
+            <span>💰 부족분 구매 비용:</span>
+            <span id="res-gold" style="color:var(--success); font-weight:bold;">0 G</span>
+          </div>
+          <hr style="border:0; border-top:1px dashed var(--border); margin:10px 0;">
+          <div class="result-item">
+            <span>💎 부족한 겁화:</span>
+            <span id="res-item-gap" style="color:#ff5252; font-weight:bold;">0 개</span>
+          </div>
+          <div class="result-item">
+            <span>🔥 부족한 불씨:</span>
+            <span id="res-gap" style="color:#ff5252; font-weight:bold;">0 개</span>
+          </div>
+          <div class="progress-container">
+            <div id="progress-bar"></div>
+          </div>
         </div>
       </div>
 
-      <div class="result-area">
-        <div id="box-low" class="comp-box">
-          <div id="badge-low" class="badge gold">골드 가성비</div>
-          <div class="comp-title">하급 결정석 모드</div>
-          <div id="low-price" class="price-text">0 G</div>
-          <div id="low-ember" class="ember-text">🔥 불씨 0개</div>
-          <div class="desc-text">불씨가 넉넉할 때 추천하는<br>최소 골드 지출 경로입니다.</div>
+      <div class="analysis-container">
+        <div class="beyond-header">
+          <h2 style="color:var(--accent); margin:0; font-size:22px;">겁화 효율 분석</h2>
         </div>
 
-        <div id="box-mid" class="comp-box">
-          <div id="badge-mid" class="badge time">시간 절약</div>
-          <div class="comp-title">중급 결정석 모드</div>
-          <div id="mid-price" class="price-text">0 G</div>
-          <div id="mid-ember" class="ember-text">🔥 불씨 0개</div>
-          <div class="desc-text">불씨 수급 시간을 아끼는<br>가장 빠른 졸업 경로입니다.</div>
+        <div class="section-title">목표 설정</div>
+        <div class="btn-selector">
+          <button class="select-btn active analysis-goal-btn" onclick="setAnalysisGoal(500, this)">500개</button>
+          <button class="select-btn analysis-goal-btn" onclick="setAnalysisGoal(1000, this)">1000개</button>
+        </div>
+
+        <div class="section-title">자산 및 시세 정보</div>
+        <div class="input-group" style="grid-template-columns: 200px 1fr 40px;">
+          <label>보유 겁화 <span style="font-size:10px; font-weight:normal; opacity:0.6;">(연동)</span></label>
+          <input type="number" id="a-cur-item" class="align-right linked-input auto-clear-zero" value="0">
+          <span>개</span>
+        </div>
+        <div class="input-group" style="grid-template-columns: 200px 1fr 40px;">
+          <label>하결 시세 <span style="font-size:10px; font-weight:normal; opacity:0.6;"></span></label>
+          <input type="number" id="a-p-low" class="align-right auto-clear-zero" value="500000" step="50000">
+          <span>미파</span>
+        </div>
+        <div class="input-group" style="grid-template-columns: 200px 1fr 40px;">
+          <label>중결 시세 <span style="font-size:10px; font-weight:normal; opacity:0.6;"></span></label>
+          <input type="number" id="a-p-mid" class="align-right auto-clear-zero" value="6000000" step="500000">
+          <span>미파</span>
+        </div>
+
+        <div class="result-box" style="margin-bottom: 20px;">
+          <div class="result-item">
+            <span>부족한 겁화 수량:</span>
+            <b id="a-need-count" style="color:var(--accent)">0 개</b>
+          </div>
+        </div>
+
+        <div class="result-area">
+          <div id="box-low" class="comp-box">
+            <div id="badge-low" class="badge gold">골드 가성비</div>
+            <div class="comp-title">하급 결정석 모드</div>
+            <div id="low-price" class="price-text">0 G</div>
+            <div id="low-ember" class="ember-text">🔥 불씨 0개</div>
+            <div class="desc-text">불씨가 넉넉할 때 추천하는<br>최소 골드 지출 경로입니다.</div>
+          </div>
+
+          <div id="box-mid" class="comp-box">
+            <div id="badge-mid" class="badge time">시간 절약</div>
+            <div class="comp-title">중급 결정석 모드</div>
+            <div id="mid-price" class="price-text">0 G</div>
+            <div id="mid-ember" class="ember-text">🔥 불씨 0개</div>
+            <div class="desc-text">불씨 수급 시간을 아끼는<br>가장 빠른 졸업 경로입니다.</div>
+          </div>
         </div>
       </div>
+
     </div>
   </div>
 
   <div id="gem-pane" class="tab-panel">
     <div class="gem-container">
       <div class="gem-header">
-        <h2 style="color:var(--accent); margin:0; font-size:20px; padding-left:5px;">보석 매매/포인트 계산기</h2>
+        <h2 style="color:var(--accent); margin:0; font-size:20px; padding-left:5px;">💎 보석 계산</h2>
         <div class="config-area">
           <label>💰 기준값 설정:</label>
-          <input type="number" id="base-val" value="25000" oninput="calcGem()" step="1000">
+          <input type="number" id="base-val" class="auto-clear-zero" value="25000" oninput="calcGem()" step="1000">
         </div>
       </div>
 
@@ -645,6 +860,30 @@
   </div>
 
   <script>
+    /* --- 테마 전환 기능 --- */
+    function toggleTheme() {
+      const doc = document.documentElement;
+      const currentTheme = doc.getAttribute('data-theme');
+      const nextTheme = currentTheme === 'light' ? 'dark' : 'light';
+      
+      doc.setAttribute('data-theme', nextTheme);
+      localStorage.setItem('theme', nextTheme);
+      updateThemeButton(nextTheme);
+    }
+
+    function updateThemeButton(theme) {
+      const btn = document.getElementById('theme-btn');
+      if (theme === 'light') {
+        btn.innerText = '🌙 다크 모드';
+      } else {
+        btn.innerText = '☀️ 라이트 모드';
+      }
+    }
+
+    const savedTheme = localStorage.getItem('theme') || 'dark';
+    document.documentElement.setAttribute('data-theme', savedTheme);
+    updateThemeButton(savedTheme);
+
     /* --- 공통 기능: 탭 전환 --- */
     function showTab(paneId, btn) {
       document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
@@ -653,22 +892,240 @@
       btn.classList.add('active');
       
       if (paneId === 'analysis-pane') {
-        const curFire = document.getElementById('f-item').value;
-        document.getElementById('a-cur-item').value = curFire;
-        calcAnalysis();
+        syncToAnalysis();
       }
     }
 
-    /* --- 겁화 & 비욘드 로직 --- */
-    let currentTargetGoal = 500;
+    /* --- 레이아웃 좌우 전환 기능 --- */
+    function toggleLayoutDirection() {
+      const wrapper1 = document.getElementById('beyond-wrapper-layout');
+      const wrapper2 = document.getElementById('analysis-wrapper-layout');
+      
+      const isReverse = wrapper1.classList.toggle('reverse');
+      if (wrapper2) wrapper2.classList.toggle('reverse', isReverse);
+      
+      localStorage.setItem('dual_save_layout_reverse', isReverse ? 'true' : 'false');
+    }
+
+    /* --- 데이터 구조화 정의 --- */
+    const fireItems = [
+      { key: 'ticket', name: '티켓' },
+      { key: 'f-ember', name: '불씨' },
+      { key: 'f-item', name: '겁화' },
+      { key: 'red-zoom', name: '적줌' },
+      { key: 'cnt-zoom', name: '초줌' },
+      { key: 'black-oil', name: '흑색 유물 ▾', isExpandable: true, subTypes: ['A', 'B', 'C', 'D'], prefix: '흑유' },
+      { key: 'crystals', name: '결정석 ▾', isExpandable: true, subTypes: ['하급', '중급', '상급', '특급', '불멸'], prefix: '' }
+    ];
+
     let currentBeyondMode = 'normal';
+    let isSyncingTickets = false; 
     const saveToLocal = (id, val) => localStorage.setItem('dual_save_' + id, val);
 
-    function setFireGoal(val) {
-      currentTargetGoal = val;
-      saveToLocal('target', val);
-      document.querySelectorAll('#fire-goal-group .select-btn').forEach(btn => btn.classList.toggle('active', parseInt(btn.dataset.value) === val));
-      calcFire();
+    /* --- 빈칸 시 0 자동 처리 --- */
+    function setupAutoClearZero(inputElement) {
+      inputElement.addEventListener('focus', function() {
+        if (this.value === '0') this.value = '';
+      });
+      inputElement.addEventListener('blur', function() {
+        if (this.value.trim() === '') {
+          this.value = '0';
+          this.dispatchEvent(new Event('input')); // 값을 0으로 복구한 뒤 재계산 트리거
+        }
+      });
+    }
+
+    /* --- 자산 그리드 테이블 초기화 --- */
+    function initFireGrid() {
+      const tbody = document.getElementById('fire-grid-body');
+      tbody.innerHTML = '';
+      
+      fireItems.forEach(item => {
+        const tr = document.createElement('tr');
+        
+        if (item.isExpandable) {
+          tr.className = "expandable-row";
+          tr.onclick = () => toggleSubPanel(item.key);
+          tr.innerHTML = `
+            <td class="row-lbl" style="color: var(--accent);">${item.name}</td>
+            <td><input type="number" id="grid-${item.key}-start" value="0" readonly style="opacity: 1.0; cursor:pointer;"></td>
+            <td><input type="number" id="grid-${item.key}-cur" value="0" readonly style="opacity: 1.0; cursor:pointer;"></td>
+            <td><input type="number" id="grid-${item.key}-diff" value="0" readonly></td>
+          `;
+          tbody.appendChild(tr);
+
+          const subTr = document.createElement('tr');
+          subTr.id = `sub-row-${item.key}`;
+          subTr.className = "sub-panel-row";
+          
+          let subTableHTML = `<td colspan="4"><table class="sub-table"><tbody>`;
+          
+          item.subTypes.forEach(type => {
+            const displayLabel = item.prefix ? `${item.prefix} ${type}` : type;
+            subTableHTML += `
+              <tr>
+                <td style="color:var(--text); opacity:0.7; width:80px; text-align:left; padding-left:10px;">${displayLabel}</td>
+                <td><input type="number" id="sub-${item.key}-${type}-start" value="0" class="watch-sub-start" data-key="${item.key}" data-type="${type}"></td>
+                <td><input type="number" id="sub-${item.key}-${type}-cur" value="0" class="watch-sub-cur" data-key="${item.key}" data-type="${type}"></td>
+                <td style="color:var(--point); font-size:12px; font-weight:bold; width:60px;" id="sub-${item.key}-${type}-diff">0</td>
+              </tr>
+            `;
+          });
+
+          subTableHTML += `</tbody></table></td>`;
+          subTr.innerHTML = subTableHTML;
+          tbody.appendChild(subTr);
+
+        } else {
+          tr.innerHTML = `
+            <td class="row-lbl">${item.name}</td>
+            <td><input type="number" id="grid-${item.key}-start" value="0" class="watch-fire-start"></td>
+            <td><input type="number" id="grid-${item.key}-cur" value="0" class="watch-fire-cur"></td>
+            <td><input type="number" id="grid-${item.key}-diff" value="0" readonly></td>
+          `;
+          tbody.appendChild(tr);
+        }
+      });
+
+      document.querySelectorAll('.watch-fire-start, .watch-fire-cur, .watch-sub-start, .watch-sub-cur').forEach(input => {
+        setupAutoClearZero(input);
+      });
+
+      fireItems.forEach(item => {
+        if (item.isExpandable) return;
+        const startInput = document.getElementById(`grid-${item.key}-start`);
+        const curInput = document.getElementById(`grid-${item.key}-cur`);
+
+        startInput.addEventListener('input', () => {
+          const cVal = parseInt(curInput.value) || 0;
+          if (cVal === 0 || curInput.dataset.synced === "true" || curInput.dataset.synced === undefined) {
+            curInput.value = startInput.value;
+            curInput.dataset.synced = "true";
+            if (item.key === 'ticket' && !isSyncingTickets) document.getElementById('t-end').value = startInput.value;
+          }
+          if (item.key === 'ticket' && !isSyncingTickets) {
+            isSyncingTickets = true;
+            document.getElementById('t-start').value = startInput.value;
+            updateForm();
+            isSyncingTickets = false;
+          }
+          calcFireDiff();
+          syncToAnalysis();
+        });
+
+        curInput.addEventListener('input', () => {
+          curInput.dataset.synced = "false"; 
+          if (item.key === 'ticket' && !isSyncingTickets) {
+            isSyncingTickets = true;
+            document.getElementById('t-end').value = curInput.value;
+            updateForm();
+            isSyncingTickets = false;
+          }
+          calcFireDiff();
+          syncToAnalysis();
+        });
+      });
+
+      document.querySelectorAll('.watch-sub-start').forEach(input => {
+        input.addEventListener('input', function() {
+          const key = this.dataset.key;
+          const type = this.dataset.type;
+          const curIn = document.getElementById(`sub-${key}-${type}-cur`);
+          
+          if ((parseInt(curIn.value) || 0) === 0 || curIn.dataset.synced === "true" || curIn.dataset.synced === undefined) {
+            curIn.value = this.value;
+            curIn.dataset.synced = "true";
+          }
+          calcSubDiff(key);
+        });
+      });
+
+      document.querySelectorAll('.watch-sub-cur').forEach(input => {
+        input.addEventListener('input', function() {
+          this.dataset.synced = "false";
+          calcSubDiff(this.dataset.key);
+        });
+      });
+    }
+
+    function toggleSubPanel(key) {
+      document.getElementById(`sub-row-${key}`).classList.toggle('open');
+    }
+
+    function calcSubDiff(key) {
+      const itemConfig = fireItems.find(i => i.key === key);
+      if (!itemConfig) return;
+
+      let totalStart = 0;
+      let totalCur = 0;
+
+      itemConfig.subTypes.forEach(type => {
+        const sVal = parseInt(document.getElementById(`sub-${key}-${type}-start`).value) || 0;
+        const cVal = parseInt(document.getElementById(`sub-${key}-${type}-cur`).value) || 0;
+        const curIn = document.getElementById(`sub-${key}-${type}-cur`);
+        
+        document.getElementById(`sub-${key}-${type}-diff`).innerText = (cVal - sVal) >= 0 ? `+${cVal - sVal}` : cVal - sVal;
+        
+        totalStart += sVal;
+        totalCur += cVal;
+
+        saveToLocal(`sub-${key}-${type}-start`, sVal);
+        saveToLocal(`sub-${key}-${type}-cur`, cVal);
+        saveToLocal(`sub-${key}-${type}-synced`, curIn.dataset.synced || "true");
+      });
+
+      document.getElementById(`grid-${key}-start`).value = totalStart;
+      document.getElementById(`grid-${key}-cur`).value = totalCur;
+      
+      calcFireDiff();
+      syncToAnalysis(); 
+    }
+
+    function calcFireDiff() {
+      fireItems.forEach(item => {
+        const startInput = document.getElementById(`grid-${item.key}-start`);
+        const curInput = document.getElementById(`grid-${item.key}-cur`);
+        const diffInput = document.getElementById(`grid-${item.key}-diff`);
+        
+        const startVal = parseInt(startInput.value) || 0;
+        const curVal = parseInt(curInput.value) || 0;
+        
+        diffInput.value = curVal - startVal;
+        
+        if (!item.isExpandable) {
+          saveToLocal(`grid-${item.key}-start`, startInput.value);
+          saveToLocal(`grid-${item.key}-cur`, curInput.value);
+          saveToLocal(`grid-${item.key}-synced`, curInput.dataset.synced || "true");
+        }
+      });
+    }
+
+    function convertCurrentToStart() {
+      fireItems.forEach(item => {
+        if (item.isExpandable) {
+          item.subTypes.forEach(type => {
+            const curIn = document.getElementById(`sub-${item.key}-${type}-cur`);
+            const startIn = document.getElementById(`sub-${item.key}-${type}-start`);
+            startIn.value = curIn.value;
+            curIn.dataset.synced = "true";
+          });
+          calcSubDiff(item.key);
+        } else {
+          const curInput = document.getElementById(`grid-${item.key}-cur`);
+          const startInput = document.getElementById(`grid-${item.key}-start`);
+          startInput.value = curInput.value;
+          curInput.dataset.synced = "true";
+
+          if (item.key === 'ticket') {
+            document.getElementById('t-start').value = curInput.value;
+            document.getElementById('t-end').value = curInput.value;
+          }
+        }
+      });
+      calcFireDiff();
+      updateForm();
+      syncToAnalysis();
+      alert("현재 개수가 모두 시작 개수로 전환되었습니다.");
     }
 
     function setBeyondMode(mode) {
@@ -678,41 +1135,105 @@
       updateForm();
     }
 
-    function calcFire() {
-      const ids = ['f-item', 'f-ember', 'f-price', 'c1', 'c2', 'c3', 'c4', 'c5'];
-      const v = {};
-      ids.forEach(id => {
-        v[id] = parseInt(document.getElementById(id).value) || 0;
-        saveToLocal(id, v[id]);
-      });
+    /* --- 데이터 양방향 연동 세팅 (수정 시 완벽 연동) --- */
+    function setupTwoWaySync() {
+      const bindGridCur = (calcId, gridId) => {
+        const el = document.getElementById(calcId);
+        if(el) {
+          el.addEventListener('input', function() {
+            const gridEl = document.getElementById(gridId);
+            gridEl.value = this.value; // 계산기 입력을 그리드에 덮어쓰기
+            gridEl.dataset.synced = "false";
+            
+            if(gridId.includes('sub-')) {
+              const parts = gridEl.id.split('-');
+              const key = parts[1]; // crystals 등
+              calcSubDiff(key); 
+            } else {
+              calcFireDiff();
+              syncToAnalysis();
+            }
+          });
+        }
+      };
 
-      const pureOwned = v['f-item'];
-      const fromCrystals = (v['c1'] * 1) + (v['c2'] * 3) + (v['c3'] * 5) + (v['c4'] * 10) + (v['c5'] * 30);
-      const expectedTotal = pureOwned + fromCrystals;
-      const itemGap = Math.max(0, currentTargetGoal - expectedTotal);
-      const goldNeeded = itemGap * v['f-price'];
-      const reqFireForCrystals = (v['c1'] * 30) + (v['c2'] * 40) + (v['c3'] * 50) + (v['c4'] * 60) + (v['c5'] * 70);
-      const crystalFireDiff = v['f-ember'] - reqFireForCrystals;
+      // 계산기 자산 입력창 -> 던전 현황판 연동
+      bindGridCur('f-item', 'grid-f-item-cur');
+      bindGridCur('a-cur-item', 'grid-f-item-cur');
+      bindGridCur('f-ember', 'grid-f-ember-cur');
+      bindGridCur('c1', 'sub-crystals-하급-cur');
+      bindGridCur('c2', 'sub-crystals-중급-cur');
+      bindGridCur('c3', 'sub-crystals-상급-cur');
+      bindGridCur('c4', 'sub-crystals-특급-cur');
+      bindGridCur('c5', 'sub-crystals-불멸-cur');
 
-      document.getElementById('res-total').innerText = `${expectedTotal.toLocaleString()} / ${currentTargetGoal.toLocaleString()}`;
-      document.getElementById('res-gold').innerText = goldNeeded.toLocaleString();
-      document.getElementById('res-item-gap').innerText = itemGap.toLocaleString() + " 개";
+      // ✨ [수정됨] 하급 시세 및 중급 시세 명시적 연동 및 저장
+      const aPLow = document.getElementById('a-p-low');
+      const aPMid = document.getElementById('a-p-mid');
+      const fPrice = document.getElementById('f-price');
 
-      const gapDisplay = document.getElementById('res-gap');
-      if (crystalFireDiff >= 0) {
-        gapDisplay.innerText = crystalFireDiff.toLocaleString() + " 개";
-        gapDisplay.style.color = "#00e676";
-        gapDisplay.previousElementSibling.innerText = "✨ 남는 불씨:";
-      } else {
-        gapDisplay.innerText = Math.abs(crystalFireDiff).toLocaleString() + " 개";
-        gapDisplay.style.color = "#ff5252";
-        gapDisplay.previousElementSibling.innerText = "🔥 교환 부족분:";
+      // 우측 분석기의 하급 시세가 변경될 때
+      if(aPLow) {
+        aPLow.addEventListener('input', function() {
+          saveToLocal('a-p-low', this.value);
+          if (fPrice && document.activeElement !== fPrice) fPrice.value = this.value;
+          calcAnalysis();
+          calcFireCalc();
+        });
       }
-      document.getElementById('progress-bar').style.width = Math.min(100, (expectedTotal / currentTargetGoal * 100)) + "%";
-      document.getElementById('a-cur-item').value = v['f-item'];
+
+      // 우측 분석기의 중급 시세가 변경될 때
+      if(aPMid) {
+        aPMid.addEventListener('input', function() {
+          saveToLocal('a-p-mid', this.value);
+          calcAnalysis();
+        });
+      }
+
+      // 좌측 계산기의 하급 시세가 변경될 때
+      if(fPrice) {
+        fPrice.addEventListener('input', function() {
+          saveToLocal('a-p-low', this.value);
+          if (aPLow && document.activeElement !== aPLow) aPLow.value = this.value;
+          calcAnalysis();
+          calcFireCalc();
+        });
+      }
     }
 
-    /* --- 효율 분석 로직 --- */
+    /* --- 데이터 연동 로직 --- */
+    function syncToAnalysis() {
+      if (!document.getElementById('a-cur-item')) return;
+      
+      const fItem = parseInt(document.getElementById('grid-f-item-cur').value) || 0;
+      const fEmber = parseInt(document.getElementById('grid-f-ember-cur').value) || 0;
+      const c1 = parseInt(document.getElementById('sub-crystals-하급-cur').value) || 0;
+      const c2 = parseInt(document.getElementById('sub-crystals-중급-cur').value) || 0;
+      const c3 = parseInt(document.getElementById('sub-crystals-상급-cur').value) || 0;
+      const c4 = parseInt(document.getElementById('sub-crystals-특급-cur').value) || 0;
+      const c5 = parseInt(document.getElementById('sub-crystals-불멸-cur').value) || 0;
+
+      // 커서가 위치한(활성화된) 엘리먼트는 덮어쓰지 않도록 방어(커서 튐 방지)
+      const setIfNotFocused = (id, val) => {
+        const el = document.getElementById(id);
+        if (document.activeElement !== el) el.value = val;
+      };
+
+      setIfNotFocused('a-cur-item', fItem);
+      setIfNotFocused('f-item', fItem);
+      setIfNotFocused('f-ember', fEmber);
+      setIfNotFocused('c1', c1);
+      setIfNotFocused('c2', c2);
+      setIfNotFocused('c3', c3);
+      setIfNotFocused('c4', c4);
+      setIfNotFocused('c5', c5);
+
+      // 시세는 입력 이벤트에서 실시간 관리되므로 여기서 강제 덮어쓰기 제외
+      calcAnalysis();
+      calcFireCalc();
+    }
+
+    /* --- 효율 분석기 로직 --- */
     let analysisGoal = 500;
     function setAnalysisGoal(val, btn) {
       analysisGoal = val;
@@ -721,7 +1242,7 @@
       calcAnalysis();
     }
 
-function calcAnalysis() {
+    function calcAnalysis() {
       const current = parseInt(document.getElementById('a-cur-item').value) || 0;
       const pLow = parseInt(document.getElementById('a-p-low').value) || 0;
       const pMid = parseInt(document.getElementById('a-p-mid').value) || 0;
@@ -729,20 +1250,16 @@ function calcAnalysis() {
       const diff = Math.max(0, analysisGoal - current);
       document.getElementById('a-need-count').innerText = diff.toLocaleString() + " 개";
 
-      // 하급 계산
       const lowPrice = diff * pLow;
       const lowEmber = diff * 30;
       
-      // 중급 계산 (1개당 겁화 3개 효과)
       const midQty = Math.ceil(diff / 3); 
       const midPrice = midQty * pMid;
       const midEmber = midQty * 40;
 
-      // 화면 표시 업데이트
       document.getElementById('low-price').innerText = lowPrice.toLocaleString() + " G";
       document.getElementById('low-ember').innerText = "🔥 불씨 " + lowEmber.toLocaleString() + "개";
       
-      // 중급 결정석 칸에 "수량" 추가 표시
       document.getElementById('mid-price').innerText = midPrice.toLocaleString() + " G";
       document.getElementById('mid-ember').innerText = `🪨 결정석 ${midQty}개 / 🔥 불씨 ${midEmber.toLocaleString()}개`;
 
@@ -770,18 +1287,59 @@ function calcAnalysis() {
         }
       }
     }
-    /* --- 기타 양식 및 보석 로직 --- */
+
+    /* --- 전란의 겁화 계산기 로직 --- */
+    let currentTargetGoal = 500;
+    function setFireGoal(val) {
+      currentTargetGoal = val;
+      saveToLocal('target', val);
+      document.querySelectorAll('#fire-goal-group .select-btn').forEach(btn => btn.classList.toggle('active', parseInt(btn.dataset.value) === val));
+      calcFireCalc();
+    }
+
+    function calcFireCalc() {
+      const fItem = parseInt(document.getElementById('f-item').value) || 0;
+      const fEmber = parseInt(document.getElementById('f-ember').value) || 0;
+      const price = parseInt(document.getElementById('f-price').value) || 0;
+      const c1 = parseInt(document.getElementById('c1').value) || 0;
+      const c2 = parseInt(document.getElementById('c2').value) || 0;
+      const c3 = parseInt(document.getElementById('c3').value) || 0;
+      const c4 = parseInt(document.getElementById('c4').value) || 0;
+      const c5 = parseInt(document.getElementById('c5').value) || 0;
+
+      const fromCrystals = (c1 * 1) + (c2 * 3) + (c3 * 5) + (c4 * 10) + (c5 * 30);
+      const expectedTotal = fItem + fromCrystals;
+      const itemGap = Math.max(0, currentTargetGoal - expectedTotal);
+      const goldNeeded = itemGap * price;
+      const reqFireForCrystals = (c1 * 30) + (c2 * 40) + (c3 * 50) + (c4 * 60) + (c5 * 70);
+      const crystalFireDiff = fEmber - reqFireForCrystals;
+
+      document.getElementById('res-total').innerText = `${expectedTotal.toLocaleString()} / ${currentTargetGoal.toLocaleString()}`;
+      document.getElementById('res-gold').innerText = goldNeeded.toLocaleString() + " G";
+      document.getElementById('res-item-gap').innerText = itemGap.toLocaleString() + " 개";
+
+      const gapDisplay = document.getElementById('res-gap');
+      if (crystalFireDiff >= 0) {
+        gapDisplay.innerText = crystalFireDiff.toLocaleString() + " 개";
+        gapDisplay.style.color = "var(--success)";
+        gapDisplay.previousElementSibling.innerText = "✨ 남는 불씨:";
+      } else {
+        gapDisplay.innerText = Math.abs(crystalFireDiff).toLocaleString() + " 개";
+        gapDisplay.style.color = "#ff5252";
+        gapDisplay.previousElementSibling.innerText = "🔥 교환 부족분:";
+      }
+      
+      const progressPercent = Math.min(100, (expectedTotal / currentTargetGoal * 100));
+      document.getElementById('progress-bar').style.width = progressPercent + "%";
+    }
+
+    /* --- 잠쩔 양식 로직 --- */
     function updateForm() {
-      // 판수 관련 데이터 저장
       saveToLocal('t-start', document.getElementById('t-start').value);
       saveToLocal('t-end', document.getElementById('t-end').value);
       saveToLocal('t-drop', document.getElementById('t-drop').value);
-      
-      // 기사 및 승객 데이터 저장 (요청하신 부분)
       saveToLocal('seller', document.getElementById('seller').value);
       saveToLocal('buyers', document.getElementById('buyers').value);
-      
-      // 경험치 설정 저장
       saveToLocal('p-time', document.getElementById('p-time').value);
       saveToLocal('p-price', document.getElementById('p-price').value);
 
@@ -794,7 +1352,7 @@ function calcAnalysis() {
       let text = `판매자(플레이): ${document.getElementById('seller').value}\n구매자(잠수): ${document.getElementById('buyers').value}\n`;
       if (currentBeyondMode === 'normal') {
         document.getElementById('exp-fields').style.display = 'none';
-        text += `금액: 판당 10\n던전 이용시간: 노경증 비욘드 ${count}판`;
+        text += `금액: 판당 10\n던전 이용시간: 비욘드 ${count}판`;
       } else {
         document.getElementById('exp-fields').style.display = 'block';
         text += `금액: ${document.getElementById('p-price').value}\n던전 이용시간: 비욘드 300경증 ${document.getElementById('p-time').value}시간`;
@@ -802,10 +1360,30 @@ function calcAnalysis() {
       document.getElementById('display').innerText = text;
     }
 
-    function resetFire() {
-      if (confirm("겁화 데이터를 초기화할까요?")) {
-        ['f-item', 'f-ember', 'c1', 'c2', 'c3', 'c4', 'c5'].forEach(id => document.getElementById(id).value = 0);
-        calcFire();
+    function resetDungeonTracker() {
+      if (confirm("자산 현황판의 모든 데이터를 초기화할까요? (연동된 계산기 데이터도 초기화됩니다)")) {
+        fireItems.forEach(item => {
+          if (item.isExpandable) {
+            item.subTypes.forEach(type => {
+              const curIn = document.getElementById(`sub-${item.key}-${type}-cur`);
+              document.getElementById(`sub-${item.key}-${type}-start`).value = 0;
+              curIn.value = 0;
+              curIn.dataset.synced = "true";
+            });
+            calcSubDiff(item.key);
+          } else {
+            const curInput = document.getElementById(`grid-${item.key}-cur`);
+            document.getElementById(`grid-${item.key}-start`).value = 0;
+            curInput.value = 0;
+            curInput.dataset.synced = "true";
+          }
+        });
+        document.getElementById('t-start').value = 0;
+        document.getElementById('t-end').value = 0;
+        document.getElementById('t-drop').value = 0;
+        calcFireDiff();
+        updateForm();
+        syncToAnalysis(); 
       }
     }
 
@@ -813,6 +1391,7 @@ function calcAnalysis() {
       navigator.clipboard.writeText(document.getElementById('display').innerText).then(() => alert("양식이 복사되었습니다!"));
     }
 
+    /* --- 보석 계산 로직 --- */
     const gemData = {
       '일반': [1, 3, 9, 27, 81, 243],
       '전직': [3, 9, 27, 81, 243, 729],
@@ -822,6 +1401,7 @@ function calcAnalysis() {
 
     function initGem() {
       const tbody = document.getElementById('gem-table-body');
+      tbody.innerHTML = '';
       Object.keys(gemData).forEach(row => {
         const tr = document.createElement('tr');
         tr.innerHTML = `<td class="row-name">${row}</td>` +
@@ -829,12 +1409,12 @@ function calcAnalysis() {
           `<td class="row-total" id="gem-sum-${row}">0</td>`;
         tbody.appendChild(tr);
       });
+      document.querySelectorAll('.gem-in').forEach(input => setupAutoClearZero(input));
     }
 
     function calcGem() {
       const base = parseInt(document.getElementById('base-val').value) || 0;
-      let gTotal = 0,
-        pTotal = 0;
+      let gTotal = 0, pTotal = 0;
       Object.keys(gemData).forEach(row => {
         let rowP = 0;
         document.querySelectorAll(`.gem-in[data-row="${row}"]`).forEach(input => rowP += (parseInt(input.value) || 0) * gemData[row][input.dataset.idx]);
@@ -847,30 +1427,115 @@ function calcAnalysis() {
       document.getElementById('grand-point').innerText = pTotal.toLocaleString();
     }
 
+    /* --- 데이터 자동 로드 및 초기화 --- */
     window.onload = function() {
+      initFireGrid();
       initGem();
-      const allFields = ['f-item', 'f-ember', 'f-price', 'c1', 'c2', 'c3', 'c4', 'c5', 't-start', 't-end', 't-drop', 'seller', 'buyers', 'p-time', 'p-price'];
-      allFields.forEach(id => {
-        const v = localStorage.getItem('dual_save_' + id);
-        if (v !== null) document.getElementById(id).value = v;
+
+      document.querySelectorAll('.auto-clear-zero').forEach(input => setupAutoClearZero(input));
+      
+      // ✨ 양방향 연동 이벤트 활성화
+      setupTwoWaySync();
+
+      // 저장된 자산 데이터 불러오기
+      fireItems.forEach(item => {
+        if (item.isExpandable) {
+          item.subTypes.forEach(type => {
+            const sVal = localStorage.getItem(`dual_save_sub-${item.key}-${type}-start`);
+            const cVal = localStorage.getItem(`dual_save_sub-${item.key}-${type}-cur`);
+            const syncState = localStorage.getItem(`dual_save_sub-${item.key}-${type}-synced`);
+            
+            if (sVal !== null) document.getElementById(`sub-${item.key}-${type}-start`).value = sVal;
+            if (cVal !== null) document.getElementById(`sub-${item.key}-${type}-cur`).value = cVal;
+            if (syncState !== null) document.getElementById(`sub-${item.key}-${type}-cur`).dataset.synced = syncState;
+          });
+          calcSubDiff(item.key);
+        } else {
+          const sVal = localStorage.getItem(`dual_save_grid-${item.key}-start`);
+          const cVal = localStorage.getItem(`dual_save_grid-${item.key}-cur`);
+          const syncState = localStorage.getItem(`dual_save_grid-${item.key}-synced`);
+          
+          if (sVal !== null) document.getElementById(`grid-${item.key}-start`).value = sVal;
+          if (cVal !== null) document.getElementById(`grid-${item.key}-cur`).value = cVal;
+          if (syncState !== null) document.getElementById(`grid-${item.key}-cur`).dataset.synced = syncState;
+        }
       });
 
+      // 기타 양식 필드 불러오기
+      const otherFields = ['t-start', 't-end', 't-drop', 'seller', 'buyers', 'p-time', 'p-price'];
+      otherFields.forEach(id => {
+        const v = localStorage.getItem('dual_save_' + id);
+        if (v !== null && document.getElementById(id)) document.getElementById(id).value = v;
+      });
+
+      // ✨ [수정됨] 하급 시세 / 중급 시세 강제 로드 및 반영
+      const savedPLow = localStorage.getItem('dual_save_a-p-low');
+      const savedPMid = localStorage.getItem('dual_save_a-p-mid');
+      if (savedPLow !== null) {
+        if (document.getElementById('a-p-low')) document.getElementById('a-p-low').value = savedPLow;
+        if (document.getElementById('f-price')) document.getElementById('f-price').value = savedPLow;
+      }
+      if (savedPMid !== null && document.getElementById('a-p-mid')) {
+        document.getElementById('a-p-mid').value = savedPMid;
+      }
+
+      // 겁화 목표 로드
       const savedTarget = localStorage.getItem('dual_save_target');
       if (savedTarget) setFireGoal(parseInt(savedTarget));
+
+      // 레이아웃 좌우 세팅 불러오기
+      const savedLayout = localStorage.getItem('dual_save_layout_reverse');
+      if (savedLayout === 'true') {
+        document.getElementById('beyond-wrapper-layout').classList.add('reverse');
+        if(document.getElementById('analysis-wrapper-layout')) {
+            document.getElementById('analysis-wrapper-layout').classList.add('reverse');
+        }
+      }
+
+      // 티켓 실시간 양방향 연동이벤트 설정
+      document.getElementById('t-start').addEventListener('input', function() {
+        if (!isSyncingTickets) {
+          isSyncingTickets = true;
+          const targetInput = document.getElementById('grid-ticket-start');
+          targetInput.value = this.value;
+          
+          const curInput = document.getElementById('grid-ticket-cur');
+          if (parseInt(curInput.value) === 0 || curInput.dataset.synced === "true" || curInput.dataset.synced === undefined) {
+            curInput.value = this.value;
+            curInput.dataset.synced = "true";
+            document.getElementById('t-end').value = this.value;
+          }
+          calcFireDiff();
+          isSyncingTickets = false;
+        }
+      });
+
+      document.getElementById('t-end').addEventListener('input', function() {
+        if (!isSyncingTickets) {
+          isSyncingTickets = true;
+          const targetInput = document.getElementById('grid-ticket-cur');
+          targetInput.value = this.value;
+          targetInput.dataset.synced = "false"; 
+          calcFireDiff();
+          isSyncingTickets = false;
+        }
+      });
 
       const savedMode = localStorage.getItem('dual_save_mode');
       if (savedMode) setBeyondMode(savedMode);
 
-      document.querySelectorAll('.watch-fire').forEach(el => el.addEventListener('input', calcFire));
-      // 비욘드 양식 필드들에 입력 이벤트 연결 (입력 즉시 저장)
       document.querySelectorAll('.watch-beyond').forEach(el => el.addEventListener('input', updateForm));
 
-      calcFire();
+      calcFireDiff();
       updateForm();
       calcGem();
-      calcAnalysis();
+      syncToAnalysis();
     };
   </script>
-</body>
 
+<div style="text-align: center; margin-top: 40px; padding: 20px; color: #888; font-size: 14px;">
+  건의 및 문의 사항은 <a href="https://forms.gle/4CWjYyuYvA4GnbvU7" style="color: #4fc3f7; text-decoration: none;"><b>@Delta</b></a> 에게 편하게 말씀해주세요.
+</div>
+
+</body>
 </html>
